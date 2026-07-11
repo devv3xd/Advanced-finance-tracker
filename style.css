@@ -4,6 +4,9 @@
   box-sizing: border-box;
 }
 
+body {
+  background: #0b0b0b;
+}
 .container {
    background-color: #0b0b0b;
    max-width: 900px;
@@ -488,4 +491,14 @@
   font-size: 22px;
   font-weight: 700;
   color: #fff;
+}
+
+#particles-js {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  background: #0b0b0b;
 }
