@@ -12,6 +12,7 @@ const categoryFilter = document.getElementById('categoryFilter')
 const sortPills = document.querySelectorAll('.sort-pill')
 const refreshBtn = document.querySelector('.refresh-btn')
 
+
 let transactions = JSON.parse(localStorage.getItem('transactions')) || []
 let currentType = 'income'
 let activeSort = 'newest'
@@ -35,6 +36,7 @@ function saveTransactions() {
     localStorage.setItem('transactions', JSON.stringify(transactions))
 }
 
+document.getElementById('currency-pill').addEventListener('change', updateDashboard)
 
 addBtn.addEventListener('click', function() {
     const desc = descInput.value.trim()
@@ -82,6 +84,10 @@ categoryFilter.addEventListener('change', renderTransactions)
 function renderTransactions() {
     txList.innerHTML = ''
 
+     const selectedCurrency = document.getElementById('currency-pill').value
+    const symbol = currencySymbols[selectedCurrency]
+    const rate = exchangeRates[selectedCurrency] || 1
+
     const searchTerm = searchInput.value.toLowerCase()
     const selectedType = typeFilter.value
     const selectedCategory = categoryFilter.value
@@ -103,6 +109,7 @@ function renderTransactions() {
 
     filtered.forEach(function(tx) {
         const isIncome = tx.type === 'income'
+        const convertedAmount = Math.round(tx.amount * rate).toLocaleString()
         txList.innerHTML += `
             <div class="tx-item">
                 <div class="tx-icon ${isIncome ? 'inc' : 'exp'}">
@@ -113,7 +120,7 @@ function renderTransactions() {
                     <div class="tx-meta">${tx.category}</div>
                 </div>
                 <div class="tx-right">
-                    <div class="tx-amt ${isIncome ? 'inc' : 'exp'}">${isIncome ? '+' : '-'}₹${tx.amount}</div>
+                    <div class="tx-amt ${isIncome ? 'inc' : 'exp'}">${isIncome ? '+' : '-'}${symbol}${convertedAmount}</div>
                     <div class="tx-date">${tx.date}</div>
                 </div>
                 <button class="del-btn" onclick="deleteTransaction(${tx.id})">
@@ -143,11 +150,14 @@ function updateDashboard() {
     })
 
     const totalBalance = totalIncome - totalExpense
+    const selectedCurrency = document.getElementById('currency-pill').value
+    const symbol = currencySymbols[selectedCurrency]
+    const rate = exchangeRates[selectedCurrency] || 1
     const statsElements = document.querySelectorAll('.stat-val')
 
-    statsElements[0].textContent = '₹' + totalBalance
-    statsElements[1].textContent = '₹' + totalIncome
-    statsElements[2].textContent = '₹' + totalExpense
+statsElements[0].textContent = symbol + Math.round(totalBalance * rate).toLocaleString()
+statsElements[1].textContent = symbol + Math.round(totalIncome * rate).toLocaleString()
+statsElements[2].textContent = symbol + Math.round(totalExpense * rate).toLocaleString()
 
     renderTransactions()
 }
